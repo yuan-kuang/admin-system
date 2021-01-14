@@ -7,7 +7,7 @@
         type="button"
         class="el-button el-button--primary el-button--small"
         style="float: right"
-        @click="submitForm('ruleForm')"
+        @click="handleSearchList('formName')"
       >
         <span> 查询搜索 </span>
       </button>
@@ -23,7 +23,6 @@
         label-width="160px"
         class="demo-ruleForm"
         :inline="true"
-        :rules="rules"
         :model="ruleForm"
         ref="ruleForm"
         inline-message="true"
@@ -192,15 +191,8 @@ export default {
     this.getOrdList();
   },
   methods: {
-    submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          alert("submit!");
-        } else {
-          console.log("error submit!!");
-          return false;
-        }
-      });
+    handleSearchList(formName){
+      console.log(this.$refs.ruleForm)
     },
     resetForm(formName) {
       this.$refs[formName].resetFields();

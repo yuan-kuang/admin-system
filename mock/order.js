@@ -269,6 +269,30 @@ export default [
       }
     }
   },
+  {
+    url: '/vue-admin-template/order/delete1',
+    type: 'get',
+    response: config => {
+      const ids = config.query.ids
+      console.log(ids)
+      const items = data.items
+      for(let i=0;i<ids.length;i++){
+
+        var index = items.findIndex(item => {
+          if (item.id == ids[i]) {
+            items.splice(index, 1);
+          }
+        })
+        
+      }
+      return {
+        code: 20000,
+        data: {
+          message: "删除商品成功"
+        }
+      }
+    }
+  },
   // {
   //   url: '/vue-admin-template/order/new',
   //   type: 'post',

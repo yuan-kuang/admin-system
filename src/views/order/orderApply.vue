@@ -1,241 +1,244 @@
-<template>
-  <div class="container">
-    <div class="el-card__head">
-      <i class="el-icon-search"></i>
-      <span>筛选搜索</span>
-      <button
-        type="button"
-        class="el-button el-button--primary el-button--small"
-        style="float: right"
-        @click="submitForm('ruleForm')"
-      >
-        <span> 查询搜索 </span>
-      </button>
-      <button
-        type="button"
-        class="el-button el-button--default el-button--small"
-        style="float: right; margin-right: 15px"
-        @click="resetForm('ruleForm')"
-      >
-        <span> 重置 </span>
-      </button>
-      <el-form
-        label-width="160px"
-        class="demo-ruleForm"
-        :inline="true"
-        :rules="rules"
-        ref="ruleForm"
-        inline-message="true"
-      >
-        <el-form-item label="输入搜索" prop="search" :span="11">
-          <el-input
-            v-model="ruleForm.search"
-            placeholder="服务单号"
-            label="left"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="处理状态" prop="state">
-          <el-select v-model="ruleForm.state" placeholder="全部" label="left">
-            <el-option label="待处理"></el-option>
-            <el-option label="退货中"></el-option>
-            <el-option label="已完成"></el-option>
-            <el-option label="已拒绝"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="申请时间">
-          <el-col>
-            <el-form-item prop="date1">
-              <el-date-picker
-                type="date"
-                placeholder="请选择时间"
-                v-model="ruleForm.date1"
-                label="left"
-              ></el-date-picker>
-            </el-form-item>
-          </el-col>
-        </el-form-item>
-        <el-form-item label="操作人员" prop="person" :span="11">
-          <el-input
-            v-model="ruleForm.search"
-            placeholder="全部"
-            label="left"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="处理时间">
-          <el-col>
-            <el-form-item prop="date2">
-              <el-date-picker
-                type="date"
-                placeholder="请选择时间"
-                v-model="ruleForm.date1"
-                label="left"
-              ></el-date-picker>
-            </el-form-item>
-          </el-col>
-        </el-form-item>
-      </el-form>
-    </div>
-    <div class="el-card__body">
+<template> 
+  <div class="app-container">
+    <el-card class="filter-container" shadow="never">
+      <div>
+        <i class="el-icon-search"></i>
+        <span>筛选搜索</span>
+        <el-button
+          style="float:right"
+          type="primary"
+          @click="handleSearchList()"
+          size="small">
+          查询搜索
+        </el-button>
+        <el-button
+          style="float:right;margin-right: 15px"
+          @click="handleResetSearch()"
+          size="small">
+          重置
+        </el-button>
+      </div>
+      <div style="margin-top: 15px">
+        <el-form :inline="true" :model="listQuery" size="small" label-width="140px">
+          <el-form-item label="输入搜索：">
+            <el-input v-model="listQuery.id" class="input-width" placeholder="服务单号"></el-input>
+          </el-form-item>
+          <el-form-item label="处理状态：">
+            <el-select v-model="listQuery.status" placeholder="全部" clearable class="input-width">
+              <el-option v-for="item in statusOptions"
+                         :key="item.value"
+                         :label="item.label"
+                         :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="申请时间：">
+            <el-date-picker
+              class="input-width"
+              v-model="listQuery.createTime"
+              value-format="yyyy-MM-dd"
+              type="date"
+              placeholder="请选择时间">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item label="操作人员：">
+            <el-input v-model="listQuery.handleMan" class="input-width" placeholder="全部"></el-input>
+          </el-form-item>
+          <el-form-item label="处理时间：">
+            <el-date-picker
+              class="input-width"
+              v-model="listQuery.handleTime"
+              value-format="yyyy-MM-dd"
+              type="date"
+              placeholder="请选择时间">
+            </el-date-picker>
+          </el-form-item>
+        </el-form>
+      </div>
+    </el-card>
+    <el-card class="operate-container" shadow="never">
       <i class="el-icon-tickets"></i>
       <span>数据列表</span>
+    </el-card>
+    <div class="table-container">
+      <el-table ref="returnApplyTable"
+                :data="list"
+                style="width: 100%;"
+                @selection-change="handleSelectionChange"
+                v-loading="listLoading" border>
+        <el-table-column type="selection" width="60" align="center"></el-table-column>
+        <el-table-column label="服务单号" width="180" align="center" prop="id">
+          <template slot-scope="scope">{{scope.row.serverid}}</template>
+        </el-table-column>
+        <el-table-column label="申请时间" width="180" align="center">
+          <template slot-scope="scope">{{scope.row.applytime}}</template>
+        </el-table-column>
+        <el-table-column label="用户账号" align="center">
+          <template slot-scope="scope">{{scope.row.account}}</template>
+        </el-table-column>
+        <el-table-column label="退款金额" width="180" align="center">
+          <template slot-scope="scope">￥{{scope.row.backmoney}}</template>
+        </el-table-column>
+        <el-table-column label="申请状态" width="180" align="center">
+          <template slot-scope="scope">{{scope.row.applystate}}</template>
+        </el-table-column>
+        <el-table-column label="处理时间" width="180" align="center">
+          <template slot-scope="scope">{{scope.row.dealtime}}</template>
+        </el-table-column>
+        <el-table-column label="操作" width="180" align="center">
+          <template slot-scope="scope">
+            <el-button
+            size="mini"
+            @click="handleViewDetail(scope.$index, scope.row)">查看详情</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
-    <div class="el-card__content">
-<el-table
-    :data="list"
-    style="width: 100%"
-    border
-    element-loading-text="Loading"
-    fit
-    highlight-current-row>
-    <el-table-column
-      type="selection"
-      width="60"
-      align="center">
-    </el-table-column>
-    <el-table-column
-      label="服务单号"
-      width="203"
-      align="center">
-      <template slot-scope="scope">{{ scope.row.serverid }}</template>
-    </el-table-column>
-    <el-table-column
-      label="申请时间"
-      width="203"
-      align="center">
-      <template slot-scope="scope">{{ scope.row.applytime }}</template>
-    </el-table-column>
-    <el-table-column
-      label="用户账号"
-      width="450"
-      align="center">
-      <template slot-scope="scope">{{ scope.row.account }}</template>
-    </el-table-column>
-    <el-table-column
-      label="退款金额"
-      width="125"
-      align="center">
-      <template slot-scope="scope">{{ scope.row.backmoney }}</template>
-    </el-table-column>
-    <el-table-column
-      label="申请状态"
-      width="203"
-      align="center">
-      <template slot-scope="scope">{{ scope.row.applystate }}</template>
-    </el-table-column>
-    <el-table-column
-      label="处理时间"
-      width="203"
-      align="center">
-      <template slot-scope="scope">{{ scope.row.dealtime }}</template>
-    </el-table-column>
-    <el-table-column
-      label="操作"
-      width="203"
-      align="center">
-        <el-button @click="handleClick(scope.row)" type="text" size="small">查看详情</el-button>
-    </el-table-column>
-    
-  </el-table>
-  <pagination
-      v-show="total>0"
+    <div class="batch-operate-container">
+      <el-select
+        size="small"
+        v-model="operateType" placeholder="批量操作">
+        <el-option
+          v-for="item in operateOptions"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value">
+        </el-option>
+      </el-select>
+      <el-button
+        style="margin-left: 20px"
+        class="search-button"
+        @click="handleBatchOperate()"
+        type="primary"
+        size="small">
+        确定
+      </el-button>
+    </div>
+    <pagination
+      v-show="total > 0"
       :total="total"
       :page.sync="listQuery.page"
       :limit.sync="listQuery.limit"
-      @pagination="getProList"
+      @pagination="getOrdList"
     />
-    </div>
-
-
-    </div>
+  </div>
 </template>
-
 <script>
-import { getOrderList } from "@/api/order";
-import Pagination from "@/components/Pagination";
-
-export default {
-  data() {
-    return {
-      list: [],
-      listLoading: true,
-      total: 0,
+  import {getOrderList,deleteOrder1} from '@/api/order';
+  import Pagination from "@/components/Pagination";
+  const defaultListQuery = {
+    id: null,
+    receiverKeyword: null,
+    status: null,
+    createTime: null,
+    handleMan: null,
+    handleTime: null
+  };
+  const defaultStatusOptions=[
+    {
+      label: '待处理',
+      value: 0
+    },
+    {
+      label: '退货中',
+      value: 1
+    },
+    {
+      label: '已完成',
+      value: 2
+    },
+    {
+      label: '已拒绝',
+      value: 3
+    }
+  ];
+  export default {
+    data() {
+      return {
+         total: 0,
       listQuery: {
         page: 1,
         limit: 10
       },
-      ruleForm: {
-        search: "",
-        date1: "",
-        data2:"",
-        state: "",
-        person:""
-      },
-      rules: {
-        name: [
-          { message: "请输入收货人姓名", trigger: "blur" },
-          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" },
+        statusOptions: Object.assign({},defaultStatusOptions),
+        list:[],
+        listLoading:false,
+        multipleSelection:[],
+        operateType:1,
+        operateOptions: [
+          {
+            label: "批量删除",
+            value: 1
+          }
         ],
-        state: [{ message: "请选择订单状态", trigger: "change" }],
-        search: [
-          { type: "date", message: "请输入订单编号", trigger: "change" },
-        ],
-        date1: [{ type: "date", message: "请选择日期", trigger: "change" }],
-        kind: [{ message: "请选择订单分类", trigger: "change" }],
-        purchase: [{ message: "请选择订单来源", trigger: "change" }],
+      }
+    },
+    created(){
+      this.getOrdList();
+    },
+    methods:{
+      handleSelectionChange(val){
+        this.multipleSelection = val;
       },
-    };
-  },
-  created() {
-    this.getOrdList();
-  },
-  methods: {
-    submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          alert("submit!");
-        } else {
-          console.log("error submit!!");
-          return false;
+      handleResetSearch() {
+        this.listQuery = Object.assign({}, defaultListQuery);
+      },
+      handleSearchList() {
+        this.listQuery.pageNum = 1;
+        this.getOrdList();
+      },
+      handleViewDetail(index,row){
+        this.$router.push({path:'/oms/returnApplyDetail',query:{id:row.id}})
+      },
+      handleBatchOperate(){
+        if(this.multipleSelection==null||this.multipleSelection.length<1){
+          this.$message({
+            message: '请选择要操作的申请',
+            type: 'warning',
+            duration: 1000
+          });
+          return;
         }
-      });
-    },
-    resetForm(formName) {
-      this.$refs[formName].resetFields();
-    },
-    async getOrdList() {
+        if(this.operateType===1){
+          this.$confirm('是否要进行删除操作?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            let params = new URLSearchParams();
+            let ids=[];
+            for(let i=0;i<this.multipleSelection.length;i++){
+              ids.push(this.multipleSelection[i].id);
+            }
+            params.append("ids",ids);
+            console.log(ids)
+            deleteOrder1(ids).then(response=>{
+              this.getOrdList();
+              this.$message({
+                type: 'success',
+                message: '删除成功!'
+              });
+            });
+          })
+        }
+      },
+      async getOrdList() {
       this.listLoading = true;
       const result = await getOrderList(this.listQuery);
       this.list = result.data.items;
       this.total = result.data.total;
       this.listLoading = false;
     },
-  },
-  components: {
-    Pagination
-  }
-};
-</script>
-
-<style lang='scss'>
-.container {
-  margin-top: 20px;
-  .el-card__head {
-    padding: 20px;
-    margin-left: 20px;
-    margin-right: 20px;
-    border: 1px solid rgb(245, 238, 238);
-    .demo-ruleForm {
-      margin-top: 30px;
+    },
+    components: {
+      Pagination
     }
   }
-  .el-card__body {
-    margin:20px;
-    padding: 20px;
-    border: 1px solid rgb(245, 238, 238);
+</script>
+<style scoped>
+  .input-width {
+    width: 203px;
   }
-  .el-card__content{
-    border: 1px solid rgb(245, 238, 238);
-    margin: 20px;
-  }
-}
 </style>
+
+

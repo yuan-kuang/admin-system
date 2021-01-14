@@ -113,7 +113,7 @@
       </div>
       <div class="el-form-item">
         <div class="el-form-item__content" style="margin-left: 150px">
-          <button type="button" class="el-button el-button--primary">
+          <button type="button" class="el-button el-button--primary" @click="handleDelete">
             <span>提交</span>
           </button>
         </div>
@@ -121,6 +121,33 @@
     </form>
   </div>
 </template>
+
+<script>
+export default{
+  methods: {
+    async handleDelete(){
+        this.$confirm('是否要提交修改？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+              this.$message({
+                type: 'success',
+                message: '修改成功!'
+          });          
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消修改'
+          });          
+        });
+        if(this.confirmButtonText = "确定"){
+        }
+    }
+  }
+  
+}
+</script>
 
 <style lang="scss">
 .el-card__body {

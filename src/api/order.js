@@ -8,6 +8,13 @@ export function getOrderList(params) {
     })
 }
 
+export function deleteOrder1(params) {
+    return request({
+      url:'/vue-admin-template/order/delete1/',
+      method:'get',
+      params
+    })
+  }
 
 export function deleteOrder(params) {
     return request({
